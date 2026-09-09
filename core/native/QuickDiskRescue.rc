@@ -1,0 +1,31 @@
+#define IDI_ICON1 101
+#define IDR_INDEX_HTML 201
+IDI_ICON1 ICON "QuickDiskRescue.ico"
+CREATEPROCESS_MANIFEST_RESOURCE_ID RT_MANIFEST "QuickDiskRescue.manifest"
+IDR_INDEX_HTML RCDATA "index_embed.html"
+
+1 VERSIONINFO
+FILEVERSION 1,0,0,0
+PRODUCTVERSION 1,0,0,0
+FILEOS 0x40004L
+FILETYPE 0x1L
+BEGIN
+  BLOCK "StringFileInfo"
+  BEGIN
+    BLOCK "041104b0"
+    BEGIN
+      VALUE "CompanyName", "maktak-105"
+      VALUE "FileDescription", "QuickDiskRescue"
+      VALUE "FileVersion", "1.0.0.0"
+      VALUE "InternalName", "QuickDiskRescue"
+      VALUE "LegalCopyright", "MIT License"
+      VALUE "OriginalFilename", "QuickDiskRescue.exe"
+      VALUE "ProductName", "QuickDiskRescue"
+      VALUE "ProductVersion", "1.0.0.0"
+    END
+  END
+  BLOCK "VarFileInfo"
+  BEGIN
+    VALUE "Translation", 0x411, 1200
+  END
+END

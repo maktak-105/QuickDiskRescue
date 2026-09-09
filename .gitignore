@@ -1,0 +1,16 @@
+__pycache__/
+*.py[cod]
+venv/
+.venv/
+*.log
+*_debug.log
+.vscode/
+.idea/
+build/
+build-tools/.venv/
+core/native/*.dll
+core/native/*.o
+core/native/index_embed.html
+dist/binary/*
+!dist/binary/.gitkeep
+CODEX_PROJECT_NOTE.txt
