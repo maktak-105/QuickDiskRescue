@@ -80,7 +80,8 @@ int run_cli(int argc, wchar_t** argv) {
         rc = qdr_diagnose_json(source.c_str(), deep, &json);
     } else if (cmd == L"tree") {
         if (source.empty()) { usage(); return 2; }
-        rc = qdr_tree_json(source.c_str(), part, from.empty() ? L"/" : from.c_str(), &json);
+        volatile int stop = 0;
+        rc = qdr_tree_json(source.c_str(), part, from.empty() ? L"/" : from.c_str(), &stop, progress_cb, nullptr, &json);
     } else if (cmd == L"copy") {
         if (source.empty() || out.empty()) { usage(); return 2; }
         volatile int stop = 0;

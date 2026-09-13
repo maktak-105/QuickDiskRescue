@@ -659,6 +659,10 @@ void apply_fixup(uint8_t* rec, uint32_t rec_size) {
     }
 }
 
+volatile int* g_ntfs_stop = nullptr;
+void (*g_ntfs_progress)(unsigned long long, unsigned long long, const wchar_t*, void*) = nullptr;
+void* g_ntfs_progress_user = nullptr;
+
 struct NtfsVol {
     Source* src = nullptr;
     uint64_t part_off = 0;
@@ -821,8 +825,16 @@ struct NtfsVol {
         }
         uint64_t recno = 0;
         const uint64_t max_rec = 200000;
+        uint64_t total_rec_est = 0;
+        for (const auto& r : mft_runs) {
+            if (total_rec_est >= max_rec) break;
+            total_rec_est += r.clusters * cluster_size / rec_size;
+        }
+        if (total_rec_est > max_rec) total_rec_est = max_rec;
+        if (!total_rec_est) total_rec_est = 1;
         for (const auto& r : mft_runs) {
             if (recno >= max_rec) break;
+            if (g_ntfs_stop && *g_ntfs_stop) return !files.empty();
             uint64_t run_bytes = r.clusters * cluster_size;
             uint64_t nrec_run = run_bytes / rec_size;
             if (r.sparse) {
@@ -831,8 +843,9 @@ struct NtfsVol {
             }
             uint64_t done = 0;
             while (done < run_bytes && recno < max_rec) {
+                if (g_ntfs_stop && *g_ntfs_stop) return !files.empty();
                 uint64_t chunk = run_bytes - done;
-                if (chunk > 1024ull * 1024) chunk = 1024ull * 1024;
+                if (chunk > 64ull * 1024) chunk = 64ull * 1024;
                 chunk = (chunk / rec_size) * rec_size;
                 if (!chunk) break;
                 uint64_t lcn = r.lcn + done / cluster_size;
@@ -848,6 +861,7 @@ struct NtfsVol {
                     files[recno] = std::move(f);
                 }
                 done += chunk;
+                if (g_ntfs_progress) g_ntfs_progress(recno, total_rec_est, L"tree", g_ntfs_progress_user);
             }
         }
         return !files.empty();
@@ -1606,10 +1620,24 @@ int qdr_repair_gpt(const wchar_t* source, int do_write, wchar_t** json_out) {
     return o.find(L"\"ok\":true") != std::wstring::npos && o.find(L"\"error\"") == std::wstring::npos ? 0 : -1;
 }
 
-int qdr_tree_json(const wchar_t* source, int partition_index, const wchar_t* ntfs_path, wchar_t** json_out) {
+int qdr_tree_json(const wchar_t* source, int partition_index, const wchar_t* ntfs_path,
+                  volatile int* stop_flag,
+                  void (*progress)(unsigned long long, unsigned long long, const wchar_t*, void*),
+                  void* user, wchar_t** json_out) {
+    g_ntfs_stop = stop_flag;
+    g_ntfs_progress = progress;
+    g_ntfs_progress_user = user;
     std::wstring err;
-    if (hold_load(source, partition_index, &err) != 0) {
+    int rc = hold_load(source, partition_index, &err);
+    g_ntfs_stop = nullptr;
+    g_ntfs_progress = nullptr;
+    g_ntfs_progress_user = nullptr;
+    if (rc != 0) {
         *json_out = dup_json(err);
+        return -1;
+    }
+    if (stop_flag && *stop_flag) {
+        *json_out = dup_json(L"{\"ok\":false,\"error\":\"cancelled\"}");
         return -1;
     }
     std::wstring want = ntfs_path && ntfs_path[0] ? ntfs_path : L"/";
@@ -1673,8 +1701,6 @@ int qdr_copy_out(const wchar_t* source, int partition_index, const wchar_t* ntfs
                  const wchar_t* dest_dir, volatile int* stop_flag,
                  void (*progress)(unsigned long long, unsigned long long, const wchar_t*, void*),
                  void* user, wchar_t** json_out) {
-    (void)progress;
-    (void)user;
     Source src;
     if (!src.open(source)) {
         *json_out = dup_json(L"{\"ok\":false,\"error\":\"open_failed\"}");
@@ -1683,18 +1709,28 @@ int qdr_copy_out(const wchar_t* source, int partition_index, const wchar_t* ntfs
     NtfsVol vol;
     std::vector<GptPart> parts;
     Source live;
-    if (!open_ntfs(src, partition_index, vol, parts)) {
-        std::wstring vpath;
-        bool locked = false;
-        if (!open_ntfs_via_volume(live, source, partition_index, vol, &vpath, &locked)) {
-            if (locked && !vpath.empty()) {
-                *json_out = dup_json(L"{\"ok\":false,\"error\":\"bitlocker_locked\",\"volume\":\"" +
-                                     json_escape(vpath) + L"\"}");
-                return -1;
-            }
-            *json_out = dup_json(L"{\"ok\":false,\"error\":\"ntfs_not_found\"}");
+    g_ntfs_stop = stop_flag;
+    g_ntfs_progress = progress;
+    g_ntfs_progress_user = user;
+    bool found = open_ntfs(src, partition_index, vol, parts);
+    std::wstring vpath;
+    bool locked = false;
+    if (!found) found = open_ntfs_via_volume(live, source, partition_index, vol, &vpath, &locked);
+    g_ntfs_stop = nullptr;
+    g_ntfs_progress = nullptr;
+    g_ntfs_progress_user = nullptr;
+    if (!found) {
+        if (locked && !vpath.empty()) {
+            *json_out = dup_json(L"{\"ok\":false,\"error\":\"bitlocker_locked\",\"volume\":\"" +
+                                 json_escape(vpath) + L"\"}");
             return -1;
         }
+        *json_out = dup_json(L"{\"ok\":false,\"error\":\"ntfs_not_found\"}");
+        return -1;
+    }
+    if (stop_flag && *stop_flag) {
+        *json_out = dup_json(L"{\"ok\":false,\"error\":\"cancelled\"}");
+        return -1;
     }
     uint64_t rec = find_path(vol, ntfs_path ? ntfs_path : L"/");
     if (rec == (uint64_t)-1) rec = 5;

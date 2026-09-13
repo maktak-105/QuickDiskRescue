@@ -8,7 +8,10 @@ void qdr_set_test_mode(int enabled);
 
 int qdr_list_disks_json(wchar_t** json_out);
 int qdr_diagnose_json(const wchar_t* source, int deep, wchar_t** json_out);
-int qdr_tree_json(const wchar_t* source, int partition_index, const wchar_t* ntfs_path, wchar_t** json_out);
+int qdr_tree_json(const wchar_t* source, int partition_index, const wchar_t* ntfs_path,
+                  volatile int* stop_flag,
+                  void (*progress)(unsigned long long done, unsigned long long total, const wchar_t* msg, void* user),
+                  void* user, wchar_t** json_out);
 int qdr_image(const wchar_t* source, const wchar_t* dest, volatile int* stop_flag,
               void (*progress)(unsigned long long done, unsigned long long total, const wchar_t* msg, void* user),
               void* user, wchar_t** json_out);

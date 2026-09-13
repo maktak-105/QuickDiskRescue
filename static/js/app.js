@@ -466,6 +466,8 @@
           if (isBl) {
             setStatus("BitLocker: 鍵が必要です");
             showBlDialog(p.volume || (partInfo && partInfo.volume) || "");
+          } else if (p.error === "cancelled") {
+            setStatus("フォルダ解析を中止しました");
           } else {
             setStatus("tree failed: " + (p.error || "unknown"));
           }
@@ -498,14 +500,27 @@
         blBek = m.path || "";
         document.getElementById("bl-bek-path").textContent = blBek;
       }
-      if (m.type === "progress") setStatus((m.message || "") + " " + fmtSize(m.done) + " / " + fmtSize(m.total));
+      if (m.type === "progress") {
+        if (m.message === "解析中") {
+          const pct = m.total ? Math.min(100, Math.round((m.done / m.total) * 100)) : 0;
+          setStatus("解析中 " + pct + "% (" + m.done + " / " + m.total + " 件)");
+        } else {
+          setStatus((m.message || "") + " " + fmtSize(m.done) + " / " + fmtSize(m.total));
+        }
+      }
       if (m.type === "copy_result") {
         const p = m.payload || {};
-        if (p.ok === false) setStatus("copy failed: " + (p.error || "unknown"));
+        if (p.error === "cancelled") setStatus("フォルダ救出を中止しました");
+        else if (p.ok === false) setStatus("copy failed: " + (p.error || "unknown"));
         else setStatus("copied " + (p.copied || 0) + " failed " + (p.failed || 0));
         stopClock();
       }
-      if (m.type === "image_result") { setStatus("image " + JSON.stringify(m.payload || {})); stopClock(); }
+      if (m.type === "image_result") {
+        const p = m.payload || {};
+        if (p.ok === false) setStatus("イメージ保存失敗: " + (p.error || "unknown"));
+        else setStatus("イメージ保存完了 (bad_lbas: " + (p.bad_lbas != null ? p.bad_lbas : 0) + ")");
+        stopClock();
+      }
       if (m.type === "carve_result") { setStatus("carved " + ((m.payload || {}).count || 0)); stopClock(); }
       if (m.type === "repair_gpt_result") {
         const p = m.payload || {};

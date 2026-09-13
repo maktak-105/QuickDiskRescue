@@ -335,7 +335,12 @@ void HandleMessage(const std::wstring& msg) {
     if (type == L"tree") {
         LaunchWork([source, part, path]() {
             wchar_t* json = nullptr;
-            qdr_tree_json(source.c_str(), part, path.c_str(), &json);
+            auto cb = [](unsigned long long done, unsigned long long total, const wchar_t*, void*) {
+                std::wstring o = L"{\"type\":\"progress\",\"done\":" + std::to_wstring(done) +
+                                 L",\"total\":" + std::to_wstring(total) + L",\"message\":\"解析中\"}";
+                PostJson(o);
+            };
+            qdr_tree_json(source.c_str(), part, path.c_str(), &g_stopFlag, cb, nullptr, &json);
             if (json) {
                 std::wstring o = L"{\"type\":\"tree_result\",\"payload\":";
                 o += json;
@@ -351,7 +356,7 @@ void HandleMessage(const std::wstring& msg) {
             wchar_t* json = nullptr;
             auto cb = [](unsigned long long done, unsigned long long total, const wchar_t*, void*) {
                 std::wstring o = L"{\"type\":\"progress\",\"done\":" + std::to_wstring(done) +
-                                 L",\"total\":" + std::to_wstring(total) + L",\"message\":\"image\"}";
+                                 L",\"total\":" + std::to_wstring(total) + L",\"message\":\"イメージ作成中\"}";
                 PostJson(o);
             };
             qdr_image(source.c_str(), dest.c_str(), &g_stopFlag, cb, nullptr, &json);
@@ -368,7 +373,12 @@ void HandleMessage(const std::wstring& msg) {
     if (type == L"copy_out") {
         LaunchWork([source, part, path, dest]() {
             wchar_t* json = nullptr;
-            qdr_copy_out(source.c_str(), part, path.c_str(), dest.c_str(), &g_stopFlag, nullptr, nullptr, &json);
+            auto cb = [](unsigned long long done, unsigned long long total, const wchar_t*, void*) {
+                std::wstring o = L"{\"type\":\"progress\",\"done\":" + std::to_wstring(done) +
+                                 L",\"total\":" + std::to_wstring(total) + L",\"message\":\"解析中\"}";
+                PostJson(o);
+            };
+            qdr_copy_out(source.c_str(), part, path.c_str(), dest.c_str(), &g_stopFlag, cb, nullptr, &json);
             if (json) {
                 std::wstring o = L"{\"type\":\"copy_result\",\"payload\":";
                 o += json;
