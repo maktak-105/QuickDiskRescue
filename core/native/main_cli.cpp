@@ -5,7 +5,7 @@
 #include <string>
 #include "engine.h"
 
-#define APP_VERSION L"1.0.0"
+#define APP_VERSION L"1.0.1"
 
 static std::string wide_to_utf8(const wchar_t* s) {
     if (!s) return {};

@@ -1,7 +1,7 @@
 # QuickDiskRescue about
 
 ## Version
-Ver. v1.0.0
+Ver. v1.0.1
 
 ## Environment
 - C++17 (MinGW-w64 / g++, WinLibs MCF UCRT)

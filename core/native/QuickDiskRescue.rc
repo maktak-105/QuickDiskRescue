@@ -5,8 +5,8 @@ CREATEPROCESS_MANIFEST_RESOURCE_ID RT_MANIFEST "QuickDiskRescue.manifest"
 IDR_INDEX_HTML RCDATA "index_embed.html"
 
 1 VERSIONINFO
-FILEVERSION 1,0,0,0
-PRODUCTVERSION 1,0,0,0
+FILEVERSION 1,0,1,0
+PRODUCTVERSION 1,0,1,0
 FILEOS 0x40004L
 FILETYPE 0x1L
 BEGIN
@@ -16,12 +16,12 @@ BEGIN
     BEGIN
       VALUE "CompanyName", "maktak-105"
       VALUE "FileDescription", "QuickDiskRescue"
-      VALUE "FileVersion", "1.0.0.0"
+      VALUE "FileVersion", "1.0.1.0"
       VALUE "InternalName", "QuickDiskRescue"
       VALUE "LegalCopyright", "MIT License"
       VALUE "OriginalFilename", "QuickDiskRescue.exe"
       VALUE "ProductName", "QuickDiskRescue"
-      VALUE "ProductVersion", "1.0.0.0"
+      VALUE "ProductVersion", "1.0.1.0"
     END
   END
   BLOCK "VarFileInfo"

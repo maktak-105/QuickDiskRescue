@@ -2,7 +2,7 @@
 
 Recover folders from disks Windows will not mount. The source is never written.
 
-Version: **v1.0.0**
+Version: **v1.0.1**
 
 Implementation: **C++17 + WebView2**. No Python in the shipped app.
 

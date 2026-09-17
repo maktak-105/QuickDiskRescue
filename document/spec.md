@@ -7,7 +7,7 @@
 - **OS**: Windows 10 / 11 (64-bit)
 - **Implementation**: C++17 (MinGW-w64) + WebView2 + HTML/CSS/vanilla JS
 - **Distribution**: flat ZIP on GitHub Releases
-- **Version**: v1.0.0
+- **Version**: v1.0.1
 - **Rights**: GUI `requireAdministrator`. CLI `asInvoker`
 
 No WRITE/TRIM/format/initialize/GPT rewrite on the source.

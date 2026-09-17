@@ -7,7 +7,7 @@
 - **対象OS**: Windows 10 / 11 (64-bit)
 - **実装**: C++17 (MinGW-w64) + WebView2 + HTML/CSS/バニラJS
 - **配布形態**: GitHub Releases の ZIP（フラット構成）
-- **バージョン**: v1.0.0
+- **バージョン**: v1.0.1
 - **権限**: GUI は `requireAdministrator`。CLI は `asInvoker`
 
 ソースへの WRITE / TRIM / フォーマット / 初期化 / GPT 書き戻しは行わない。

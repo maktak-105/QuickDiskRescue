@@ -1,5 +1,53 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
-  <rect width="256" height="256" rx="48" fill="#0a0c10"/>
-  <circle cx="128" cy="128" r="72" fill="none" stroke="#00f0ff" stroke-width="18"/>
-  <circle cx="128" cy="128" r="36" fill="#3b82f6"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-labelledby="title desc">
+  <title id="title">QuickDiskRescue</title>
+  <desc id="desc">Metal disk platter with a red rescue cross badge in the lower-right foreground.</desc>
+  <defs>
+    <linearGradient id="background" x1="24" y1="18" x2="232" y2="242" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#172a42"/>
+      <stop offset="1" stop-color="#07111f"/>
+    </linearGradient>
+    <radialGradient id="platter" cx="82" cy="72" r="132" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#f2f7fb"/>
+      <stop offset=".18" stop-color="#aebfce"/>
+      <stop offset=".44" stop-color="#596f86"/>
+      <stop offset=".72" stop-color="#263e59"/>
+      <stop offset="1" stop-color="#142943"/>
+    </radialGradient>
+    <radialGradient id="hub" cx="102" cy="95" r="30" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ffffff"/>
+      <stop offset=".36" stop-color="#c9d7e2"/>
+      <stop offset="1" stop-color="#60788e"/>
+    </radialGradient>
+    <linearGradient id="cross" x1="159" y1="153" x2="223" y2="229" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ff5b61"/>
+      <stop offset=".45" stop-color="#e62432"/>
+      <stop offset="1" stop-color="#aa081c"/>
+    </linearGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="5" stdDeviation="4" flood-color="#020711" flood-opacity=".72"/>
+    </filter>
+  </defs>
+
+  <rect width="256" height="256" rx="52" fill="url(#background)"/>
+  <path d="M29 65C48 31 83 13 122 13c35 0 67 15 88 41" fill="none" stroke="#32516e" stroke-width="7" stroke-linecap="round" opacity=".72"/>
+
+  <!-- Disk platter: intentionally offset up-left so the rescue badge remains foregrounded. -->
+  <g filter="url(#shadow)">
+    <circle cx="111" cy="112" r="88" fill="#0b1829" stroke="#6d849a" stroke-width="5"/>
+    <circle cx="111" cy="112" r="80" fill="url(#platter)" stroke="#d9e4ed" stroke-width="3"/>
+    <circle cx="111" cy="112" r="57" fill="none" stroke="#182f49" stroke-width="12" opacity=".92"/>
+    <circle cx="111" cy="112" r="48" fill="none" stroke="#94aabe" stroke-width="3" opacity=".85"/>
+    <path d="M49 70a80 80 0 0 1 110-15" fill="none" stroke="#f7fbff" stroke-width="7" stroke-linecap="round" opacity=".46"/>
+    <path d="M40 133a76 76 0 0 0 91 56" fill="none" stroke="#0b1d32" stroke-width="8" stroke-linecap="round" opacity=".5"/>
+    <circle cx="111" cy="112" r="21" fill="url(#hub)" stroke="#334c64" stroke-width="5"/>
+    <circle cx="111" cy="112" r="7" fill="#eef5fa"/>
+  </g>
+
+  <!-- Lower-right rescue badge, deliberately above the disk. -->
+  <g filter="url(#shadow)">
+    <circle cx="190" cy="190" r="49" fill="#f8fbff" stroke="#14263b" stroke-width="7"/>
+    <circle cx="190" cy="190" r="42" fill="none" stroke="#d7e1e9" stroke-width="3"/>
+    <path d="M176 153h28v23h23v28h-23v23h-28v-23h-23v-28h23z" fill="url(#cross)" stroke="#970c1a" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M180 158h20v23h-20z" fill="#ff8990" opacity=".42"/>
+  </g>
 </svg>
