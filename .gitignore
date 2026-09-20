@@ -7,10 +7,7 @@ venv/
 .vscode/
 .idea/
 build/
-build-tools/.venv/
-core/native/*.dll
-core/native/*.o
-core/native/index_embed.html
-dist/binary/*
-!dist/binary/.gitkeep
+scripts/.venv/
+dist/*
+!dist/.gitkeep
 CODEX_PROJECT_NOTE.txt

@@ -1,0 +1,110 @@
+name: Build and upload distribution asset
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Existing release tag to update, for example v1.0.1'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref }}
+
+      - name: Install MinGW and Python
+        shell: pwsh
+        run: choco install mingw python --yes --no-progress
+
+      - name: Install WebView2 SDK headers
+        shell: pwsh
+        run: |
+          $sdk = Join-Path $env:RUNNER_TEMP 'webview2-sdk.zip'
+          $dir = Join-Path $env:RUNNER_TEMP 'webview2-sdk'
+          Invoke-WebRequest 'https://www.nuget.org/api/v2/package/Microsoft.Web.WebView2' -OutFile $sdk
+          Expand-Archive -LiteralPath $sdk -DestinationPath $dir -Force
+          "WEBVIEW2_INCLUDE=$dir\build\native\include" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Build native application
+        shell: pwsh
+        run: |
+          $env:PYTHONIOENCODING = 'utf-8'
+          python scripts/build.py
+          if ($LASTEXITCODE -ne 0) { throw 'Native build failed' }
+
+      - name: Test CLI
+        shell: pwsh
+        run: |
+          python proto/tests/test_cli.py
+          if ($LASTEXITCODE -ne 0) { throw 'CLI tests failed' }
+
+      - name: Package distribution files
+        shell: pwsh
+        run: |
+          $files = @(
+            'dist/QuickDiskRescue.exe',
+            'dist/QuickDiskRescue_cli.exe',
+            'dist/WebView2Loader.dll',
+            'docs/distribution/readme.txt',
+            'docs/distribution/readme_jp.txt',
+            'docs/distribution/history.txt',
+            'docs/distribution/history_jp.txt',
+            'docs/distribution/LICENSE.txt',
+            'docs/distribution/LICENSE_jp.txt'
+          )
+          foreach ($file in $files) {
+            if (!(Test-Path -LiteralPath $file)) { throw "Missing distribution file: $file" }
+          }
+          $staging = Join-Path $env:RUNNER_TEMP 'QuickDiskRescue-package'
+          New-Item -ItemType Directory -Path $staging -Force | Out-Null
+          foreach ($file in $files) {
+            Copy-Item -LiteralPath $file -Destination $staging -Force
+          }
+
+          Compress-Archive -Path (Join-Path $staging '*') -DestinationPath (Join-Path $env:GITHUB_WORKSPACE 'QuickDiskRescue-binary.zip') -Force
+
+      - name: Generate SHA-256 checksums
+        shell: pwsh
+        run: |
+          $checksumFile = Join-Path $env:GITHUB_WORKSPACE 'SHA256SUMS.txt'
+          $lines = @()
+          $zipPath = Join-Path $env:GITHUB_WORKSPACE 'QuickDiskRescue-binary.zip'
+          $zipHash = (Get-FileHash -Algorithm SHA256 -Path $zipPath).Hash.ToUpper()
+          $lines += "$zipHash  QuickDiskRescue-binary.zip"
+          $lines += ""
+          $lines += "# Binaries inside archive:"
+          $binFiles = @('dist/QuickDiskRescue.exe', 'dist/QuickDiskRescue_cli.exe', 'dist/WebView2Loader.dll')
+          foreach ($f in $binFiles) {
+            if (Test-Path -LiteralPath $f) {
+              $h = (Get-FileHash -Algorithm SHA256 -Path $f).Hash.ToUpper()
+              $name = Split-Path -Leaf $f
+              $lines += "$h  $name"
+            }
+          }
+          $lines | Set-Content -Path $checksumFile -Encoding utf8
+
+      - name: Upload release asset
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
+          name: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
+          files: |
+            QuickDiskRescue-binary.zip
+            SHA256SUMS.txt
+          overwrite_files: true
+          generate_release_notes: true
+          body: |
+            QuickDiskRescue ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
+
+            Download `QuickDiskRescue-binary.zip`, extract every file into the same folder, and run `QuickDiskRescue.exe`.
+            Keep `QuickDiskRescue.exe` and `WebView2Loader.dll` together (the UI is embedded in the EXE).

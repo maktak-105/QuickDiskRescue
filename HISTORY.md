@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.0.2 — 2026-09-20
+
+- Fixed the project restructure, build/package paths, and release verification.
+
 ## v1.0.1 — 2026-09-17
 
 - Updated the application icon: disk platter background with a red rescue-cross badge in the lower-right foreground.

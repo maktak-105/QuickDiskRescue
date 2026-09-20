@@ -1,0 +1,6 @@
+v1.0.2 (2026-09-20)
+- Fixed build and release packaging after the folder restructure.
+
+v1.0.0 2026-09-09
+First release. Diagnose, folder rescue, image, carve.
+Help expanded: state/action, screen map, button steps, status strings.

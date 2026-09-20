@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [master]
+  push:
+    branches: [master]
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install MinGW and Python
+        shell: pwsh
+        run: choco install mingw python --yes --no-progress
+
+      - name: Install WebView2 SDK headers
+        shell: pwsh
+        run: |
+          $sdk = Join-Path $env:RUNNER_TEMP 'webview2-sdk.zip'
+          $dir = Join-Path $env:RUNNER_TEMP 'webview2-sdk'
+          Invoke-WebRequest 'https://www.nuget.org/api/v2/package/Microsoft.Web.WebView2' -OutFile $sdk
+          Expand-Archive -LiteralPath $sdk -DestinationPath $dir -Force
+          "WEBVIEW2_INCLUDE=$dir\build\native\include" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Build native application
+        shell: pwsh
+        run: |
+          $env:PYTHONIOENCODING = 'utf-8'
+          python scripts/build.py
+          if ($LASTEXITCODE -ne 0) { throw 'Native build failed' }
+
+      - name: Test CLI
+        shell: pwsh
+        run: |
+          python proto/tests/test_cli.py
+          if ($LASTEXITCODE -ne 0) { throw 'CLI tests failed' }

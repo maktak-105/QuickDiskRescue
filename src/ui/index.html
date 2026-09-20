@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QuickDiskRescue</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="menubar">
+    <div class="menu-item">
+      <span data-i18n="menu_file"></span>
+      <div class="menu-dropdown">
+        <div class="menu-action" data-action="open"><span data-i18n="act_open"></span><span class="menu-shortcut">Ctrl+O</span></div>
+        <div class="menu-sep"></div>
+        <div class="menu-action" data-action="quit"><span data-i18n="act_quit"></span><span class="menu-shortcut">Ctrl+Q</span></div>
+      </div>
+    </div>
+    <div class="menu-item">
+      <span data-i18n="menu_help"></span>
+      <div class="menu-dropdown">
+        <div class="menu-action" data-action="help"><span data-i18n="act_help"></span></div>
+        <div class="menu-action" data-action="about"><span data-i18n="act_about"></span></div>
+      </div>
+    </div>
+    <span id="readonly-badge" data-i18n="readonly"></span>
+    <button id="btn-lang" class="btn-action" title="Toggle Language / 言語切替">
+      <span id="lang-text">🌐 English</span>
+    </button>
+  </div>
+
+  <div id="toolbar">
+    <button id="btn-diagnose" data-i18n="btn_diagnose"></button>
+    <button id="btn-deep-scan" data-i18n="btn_deep"></button>
+    <button id="btn-image" data-i18n="btn_image"></button>
+    <button id="btn-copy" data-i18n="btn_copy"></button>
+    <button id="btn-carve" data-i18n="btn_carve"></button>
+    <button id="btn-repair-gpt" data-i18n="btn_repair_gpt"></button>
+    <button id="btn-cancel" data-i18n="btn_cancel"></button>
+  </div>
+
+  <div id="main">
+    <div id="nav-col">
+      <div id="nav-pane">
+        <ul id="disk-list"></ul>
+      </div>
+      <div id="time-box">
+        <div class="time-row">
+          <span class="time-label" data-i18n="lbl_elapsed"></span>
+          <span class="time-val" id="time-val">—</span>
+        </div>
+      </div>
+    </div>
+    <div id="splitter"></div>
+    <div id="tree-pane">
+      <div id="hw-pane">—</div>
+      <div id="smart-pane">
+        <div id="smart-head"></div>
+        <table id="smart-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th data-i18n="col_attr"></th>
+              <th data-i18n="col_cur"></th>
+              <th data-i18n="col_worst"></th>
+              <th data-i18n="col_thr"></th>
+              <th>RAW</th>
+            </tr>
+          </thead>
+          <tbody id="smart-body"></tbody>
+        </table>
+      </div>
+      <div id="diag-pane">—</div>
+      <table id="tree-table">
+        <thead>
+          <tr>
+            <th data-i18n="col_name"></th>
+            <th data-i18n="col_size"></th>
+            <th data-i18n="col_flag"></th>
+          </tr>
+        </thead>
+        <tbody id="tree-body"></tbody>
+      </table>
+    </div>
+  </div>
+  <div id="status">Ready</div>
+
+  <div id="about-overlay" class="overlay hidden">
+    <div class="about-dialog">
+      <div id="about-content"></div>
+      <img class="about-author" src="img/author.jpg" alt="Jûgo / @maktak105">
+      <button id="about-close">OK</button>
+    </div>
+  </div>
+
+  <div id="help-overlay" class="overlay hidden">
+    <div class="help-dialog">
+      <div id="help-content"></div>
+      <button id="help-close">OK</button>
+    </div>
+  </div>
+
+  <div id="bl-overlay" class="overlay hidden">
+    <div class="about-dialog" id="bl-dialog">
+      <h3 data-i18n="bl_title"></h3>
+      <p data-i18n="bl_body"></p>
+      <label data-i18n="bl_rp"></label>
+      <input id="bl-rp" type="text" autocomplete="off" spellcheck="false">
+      <label data-i18n="bl_pw"></label>
+      <input id="bl-pw" type="password" autocomplete="off">
+      <div class="bl-row">
+        <button id="bl-bek" type="button" data-i18n="bl_bek"></button>
+        <span id="bl-bek-path"></span>
+      </div>
+      <div class="bl-row">
+        <button id="bl-unlock" type="button" data-i18n="bl_go"></button>
+        <button id="bl-cancel" type="button" data-i18n="bl_cancel"></button>
+      </div>
+    </div>
+  </div>
+  <script src="js/app.js"></script>
+</body>
+</html>

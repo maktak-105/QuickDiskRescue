@@ -1,3 +1,0 @@
-v1.0.0 2026-09-09
-First release. Diagnose, folder rescue, image, carve.
-Help expanded: state/action, screen map, button steps, status strings.
