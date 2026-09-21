@@ -11,3 +11,7 @@ scripts/.venv/
 dist/*
 !dist/.gitkeep
 CODEX_PROJECT_NOTE.txt
+
+# Generated files of the old core/native build (the rules were dropped by the 2026-09-19/20 restructure)
+core/native/*.o
+core/native/index_embed.html
