@@ -8,6 +8,8 @@ Implementation: **C++17 + WebView2**. No Python in the shipped app.
 
 ## Using the binary release
 
+Code signing: Free code signing provided by [SignPath.io](https://signpath.io), certificate by [SignPath Foundation](https://signpath.org). The application is under review; releases published after approval will be signed. See [Code signing policy](docs/code_signing_policy.md).
+
 Download the distribution ZIP from GitHub Releases:
 
 - [Latest releases](https://github.com/maktak-105/QuickDiskRescue/releases)

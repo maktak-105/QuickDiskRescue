@@ -8,6 +8,8 @@ Windows がマウントできないディスクから、フォルダ構造を保
 
 ## 配布版を使う
 
+コード署名: [SignPath.io](https://signpath.io) による無償のコード署名を利用し、証明書は [SignPath Foundation](https://signpath.org) が発行します。現在申請中で、承認後に公開するリリースから署名されます。詳細は [コード署名ポリシー](docs/code_signing_policy.md)。
+
 GitHub Releases から ZIP をダウンロードしてください:
 
 - [最新の Release](https://github.com/maktak-105/QuickDiskRescue/releases)
